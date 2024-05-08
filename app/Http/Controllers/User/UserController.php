@@ -89,26 +89,7 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        try {
-            // Encontrar o produto pelo ID
-            $cliente = Cliente::findOrFail($id);
-           
-            // Atualizar os dados do produto
-            $cliente->update([
-                'nome' => $request->nome,
-                'cpf' =>  $request->cpf,               
-                'data_nascimento' => $request->data_nascimento,
-                'sexo' => $request->sexo,
-                'endereco' => $request->endereco,
-                'estado' => $request->estado,
-                'cidade' => $request->cidade,                
-            ]);
-           
-            return response()->json(['message' => 'Cliente atualizado com sucesso!']);
-        } catch (\Exception $e) {
-            // Retorno de resposta JSON em caso de erro
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+       //
     }
 
     /**

@@ -11,11 +11,11 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = $request->only(['email', 'password']);
+        $credentials = $request->only(['name_user', 'password']);
 
         try {
             if (!$token = auth('api')->attempt($credentials)) {
-                throw new \Exception('Email ou senha incorreto');
+                throw new \Exception('Usuário ou senha incorreto');
             }
 
             $user = auth('api')->user();
@@ -24,8 +24,8 @@ class AuthController extends Controller
                 'token' => $token,
                 'user' => [
                     'name' => $user->name,
-                    'email' => $user->email,
-                    'perfils_id' =>$user->perfils_id,
+                    'name_user' => $user->name_user,
+                    'group_id' => $user->group_id,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -38,7 +38,7 @@ class AuthController extends Controller
     {
         auth('api')->logout();
 
-        return response()->json(['message' => 'Logout realizado com sucesso !!']);
+        return response()->json(['message' => 'Logout realizado com sucesso!']);
     }
 
 
