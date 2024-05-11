@@ -26,5 +26,6 @@ Route::middleware('jwt.auth',)->group(function () {
     Route::apiResource('/patient', PatientController::class);
     Route::get('/exams', [MedicoController::class, 'getExams']);
     Route::apiResource('/consultation', ConsultationController::class);
+    Route::post('/consultation/start', [ConsultationController::class, 'consultationStart']);
 });
 Route::post('login', [AuthController::class, 'login'])->name('login');

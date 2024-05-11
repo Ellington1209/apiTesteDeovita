@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('consultation_records', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('doctor_id');
-            $table->unsignedBigInteger('patient_id');
-            $table->date('date');
-            $table->time('hours');
+            $table->unsignedBigInteger('doctor_id')->nullable();
+            $table->unsignedBigInteger('patient_id')->nullable();
+            $table->date('date')->nullable();
+            $table->enum('status', ['start', 'finished']);
+            $table->timestamp('start_time')->nullable();
+            $table->timestamp('end_time')->nullable();
             $table->timestamps();
 
             // Foreign keys references

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('exam_id')->references('id')->on('exams')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-            $table->foreign('consultation_records_id')->references('id')->on('consultation_records')
+            $table->foreign('consultation_record_id')->references('id')->on('consultation_records')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });

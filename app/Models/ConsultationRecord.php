@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ConsultationRecord extends Model
 {
     protected $fillable = [
-        'doctor_id', 'patient_id', 'date', 'hours'
+        'doctor_id', 'patient_id', 'date', 'start_time', 'end_time', 'status'
     ];
     public function doctor()
     {

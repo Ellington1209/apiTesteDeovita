@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 
 class ConsultationController extends Controller
 {
@@ -20,11 +21,26 @@ class ConsultationController extends Controller
         // Obter o ID do médico logado
         $doctorId = Doctor::where('user_id', Auth::id())->firstOrFail()->id;
 
-        // Buscar registros de consulta para esse médico
-        $consultations = ConsultationRecord::with(['patient.user', 'examsConsultations.exam'])
+        // Determinar a página atual e o tamanho da página
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+
+        // Buscar registros de consulta para esse médico com paginação
+        $paginatedConsultations = ConsultationRecord::with(['patient.user', 'examsConsultations.exam'])
             ->where('doctor_id', $doctorId)
-            ->get()
+            ->where('status', 'finished')
+            ->paginate($pageSize, ['*'], 'page', $page);
+
+        // Transformar os dados para incluir a duração calculada
+        $consultations = collect($paginatedConsultations->items())
             ->map(function ($consultation) {
+                $duration = null;
+                if ($consultation->start_time && $consultation->end_time) {
+                    $start = Carbon::parse($consultation->start_time);
+                    $end = Carbon::parse($consultation->end_time);
+                    $duration = $end->diffInMinutes($start) . ' minutos';
+                }
+
                 return [
                     'name' => $consultation->patient->user->name,
                     'email' => $consultation->patient->user->email,
@@ -33,11 +49,32 @@ class ConsultationController extends Controller
                     'sex' => $consultation->patient->sex,
                     'exams' => $consultation->examsConsultations->map(function ($ec) {
                         return $ec->exam->type_of_exam;
-                    })->toArray()
+                    })->toArray(),
+                    'duration' => $duration
                 ];
             });
 
-        return response()->json($consultations);
+        // Devolver dados paginados com metadados
+        return response()->json([
+            'consultations' => $consultations,
+            'totalPages' => $paginatedConsultations->lastPage(),
+            'currentPage' => $paginatedConsultations->currentPage(),
+            'totalItems' => $paginatedConsultations->total()
+        ]);
+    }
+    public function consultationStart()
+    {
+        $consultationRecord = new ConsultationRecord([
+            'status' => 'start',
+            'start_time' => Carbon::now(),
+            'date' => Carbon::today()->toDateString(),
+        ]);
+
+        $consultationRecord->save();
+
+        return response()->json([
+            'idConsultation' => $consultationRecord->id
+        ]);
     }
 
     public function store(Request $request)
@@ -45,7 +82,15 @@ class ConsultationController extends Controller
         $request->validate([
             'patientId' => 'required|integer',
         ]);
+        $consultationId = $request->input('idConsultation');
+        if (!$consultationId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Não foi possivel iniciar a consulta, tente novamente',
 
+            ], 400);
+        }
+        $consultationRecord = ConsultationRecord::find($consultationId);
 
         DB::beginTransaction();
 
@@ -60,13 +105,13 @@ class ConsultationController extends Controller
                 return response()->json(['error' => 'Paciente não encontrado'], 404);
             }
 
-            $consultationRecord = new ConsultationRecord([
+            $consultationRecord->update([
                 'doctor_id' => $doctor->id,
                 'patient_id' => $patient->id,
-                'date' => Carbon::today()->toDateString(),
-                'hours' => Carbon::now()->toTimeString(),
+                'end_time' => Carbon::now(),
+                'status' => 'finished'
             ]);
-            $consultationRecord->save();
+
 
             // Processa cada prescrição individualmente
             foreach ($request->prescription as $prescriptionText) {
