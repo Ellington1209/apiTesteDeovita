@@ -6,7 +6,7 @@
 
 Para acessar o sistema, utilize as seguintes credenciais:
 
--   **Email:** medico1234
+-   **usuario:** medico1234
 -   **Senha:** 123456
 
 ### Como Configurar o Projeto
