@@ -19,16 +19,14 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name','email','password','perfils_id','telefone','endereco','rg','cpf'
-    ];
+    protected $fillable = [];
 
-    public static function getUsers()
+
+    public function patient()
     {
-        return self::join('perfils', 'users.perfils_id', '=', 'perfils.id')
-            ->select('users.*', 'perfils.perfil')
-            ->get();
+        return $this->hasOne(Patient::class, 'user_id');
     }
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -40,7 +38,7 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
- 
+
 
     /**
      * The attributes that should be cast.
@@ -51,7 +49,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-       // Rest omitted for brevity
+    // Rest omitted for brevity
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.

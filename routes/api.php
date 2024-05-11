@@ -1,9 +1,9 @@
 <?php
 
-
+use App\Http\Controllers\Admin\MedicoController;
+use App\Http\Controllers\Admin\PatientController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Cliente\ClienteController;
-use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Doctor\ConsultationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,13 +16,15 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::middleware('jwt.auth',)->group(function(){
+
+Route::middleware('jwt.auth',)->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('refresh', [AuthController::class, 'refresh'])->name('refresh');
     Route::post('me', [AuthController::class, 'me'])->name('me');
-    Route::apiResource('/users', UserController::class);
-    Route::apiResource('/client', ClienteController::class);
 
+    Route::apiResource('/doctor', MedicoController::class);
+    Route::apiResource('/patient', PatientController::class);
+    Route::get('/exams', [MedicoController::class, 'getExams']);
+    Route::apiResource('/consultation', ConsultationController::class);
 });
 Route::post('login', [AuthController::class, 'login'])->name('login');
-

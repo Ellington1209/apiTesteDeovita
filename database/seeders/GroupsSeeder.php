@@ -12,8 +12,8 @@ class GroupsSeeder extends Seeder
     {
         Group::insert([
             ['group' => 'admin'],
-            ['group' => 'medico'],
-            ['group' => 'paciente']
+            ['group' => 'doctor'],
+            ['group' => 'patient']
         ]);
     }
 }
