@@ -20,6 +20,15 @@ Para acessar o sistema, utilize as seguintes credenciais:
 2. Execute as migrações do banco de dados para criar as tabelas necessárias:
 
     ```
+    faça as configurações necessarias no arquivo .env
+    ex:
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3307
+    DB_DATABASE=testeDeovita
+    DB_USERNAME=root
+    DB_PASSWORD=root
+    
     php artisan migrate
     ```
 
